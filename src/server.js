@@ -1,3 +1,4 @@
+import { log } from 'console';
 import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
@@ -14,5 +15,11 @@ const handleListen = () => console.log(`Listening on http://localhost:3004`);
 const server = http.createServer(app);
 const wss = new WebSocket.Server({
   server,
+});
+
+wss.on('connection', (socket) => {
+  console.log('browser on');
+  socket.on('close', () => console.log('sever off s'));
+  socket.send('hello');
 });
 server.listen(3004, handleListen);
