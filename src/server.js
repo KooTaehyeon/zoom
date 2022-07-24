@@ -17,9 +17,18 @@ const wss = new WebSocket.Server({
   server,
 });
 
+const onSocketClose = () => {
+  console.log('sever off s');
+};
+
+const sockets = [];
+
 wss.on('connection', (socket) => {
+  sockets.push(socket);
   console.log('browser on');
-  socket.on('close', () => console.log('sever off s'));
-  socket.send('hello');
+  socket.on('close', onSocketClose);
+  socket.on('message', (message) => {
+    sockets.forEach((aSocket) => aSocket.send(message));
+  });
 });
 server.listen(3004, handleListen);
