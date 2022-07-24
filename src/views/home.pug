@@ -10,11 +10,16 @@ html(lang="en")
        header 
             h1 Nomm
        main 
-            form#nick
-                input(type="text",placeholder="choose a ninkName",required)
-                button Save
-            ul
-            form#message
-                input(type="text",placeholder="write a meg",required)
-                button Send
-       script(src="/public/js/index.js") 
+        script(src="/socket.io/socket.io.js") 
+        script(src="/public/js/index.js") 
+    
+
+
+       // 웹소켓
+          //-   form#nick
+          //-       input(type="text",placeholder="choose a ninkName",required)
+          //-       button Save
+          //-   ul
+          //-   form#message
+          //-       input(type="text",placeholder="write a meg",required)
+          //-       button Send

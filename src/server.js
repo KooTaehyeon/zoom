@@ -2,6 +2,8 @@ import { log } from 'console';
 import express from 'express';
 import http from 'http';
 import WebSocket from 'ws';
+import { Server } from 'socket.io';
+//SocketIO
 const app = express();
 
 app.set('view engine', 'pug');
@@ -9,45 +11,53 @@ app.set('views', __dirname + '/views');
 app.use('/public', express.static(__dirname + '/public'));
 app.get('/', (req, res) => res.render('home'));
 app.get('/*', (rep, res) => res.redirect('/'));
+
+const httpServer = http.createServer(app);
+const wsServer = new Server(httpServer);
+wsServer.on('connection', (socket) => {
+  console.log(socket);
+});
+
 const handleListen = () => console.log(`Listening on http://localhost:3004`);
-// app.listen(3004, handleListen);
+httpServer.listen(3004, handleListen);
+// 웹소켓 방식
 
-const server = http.createServer(app);
-const wss = new WebSocket.Server({
-  server,
-});
+// const server = http.createServer(app);
+// const wss = new WebSocket.Server({
+//   server,
+// });
 
-const onSocketClose = () => {
-  console.log('sever off s');
-};
+// const onSocketClose = () => {
+//   console.log('sever off s');
+// };
 
-const sockets = [];
+// const sockets = [];
 
-wss.on('connection', (socket) => {
-  sockets.push(socket);
-  socket['nickname'] = 'Anon';
-  console.log('browser on');
-  socket.on('close', onSocketClose);
-  socket.on('message', (msg) => {
-    const message = JSON.parse(msg);
-    switch (message.type) {
-      case 'new_message':
-        sockets.forEach((aSocket) =>
-          aSocket.send(`${socket.nickname}:${message.payload}`)
-        );
-      case 'nickname':
-        socket['nickname'] = message.payload;
-    }
-  });
-});
-server.listen(3004, handleListen);
+// wss.on('connection', (socket) => {
+//   sockets.push(socket);
+//   socket['nickname'] = 'Anon';
+//   console.log('browser on');
+//   socket.on('close', onSocketClose);
+//   socket.on('message', (msg) => {
+//     const message = JSON.parse(msg);
+//     switch (message.type) {
+//       case 'new_message':
+//         sockets.forEach((aSocket) =>
+//           aSocket.send(`${socket.nickname}:${message.payload}`)
+//         );
+//       case 'nickname':
+//         socket['nickname'] = message.payload;
+//     }
+//   });
+// });
+// server.listen(3004, handleListen);
 
-{
-  type: 'nickName';
-  payload: 'nico';
-}
+// {
+//   type: 'nickName';
+//   payload: 'nico';
+// }
 
-{
-  type: 'message';
-  payload: 'hello everyone';
-}
+// {
+//   type: 'message';
+//   payload: 'hello everyone';
+// }
