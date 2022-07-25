@@ -11,15 +11,17 @@ const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
 
 wsServer.on('connection', (socket) => {
+  socket.onAny((event) => {
+    console.log(`Socket : ${event}`);
+  });
   socket.on('enter_room', (roomName, done) => {
-    console.log(roomName);
-    setTimeout(() => {
-      done('backEnd');
-    }, 1000);
+    socket.join(roomName);
+
+    done();
   });
 });
-const handleListen = () => console.log(`Listening on http://localhost:3006`);
-httpServer.listen(3006, handleListen);
+const handleListen = () => console.log(`Listening on http://localhost:3007`);
+httpServer.listen(3007, handleListen);
 // 웹소켓 방식
 
 // const server = http.createServer(app);
