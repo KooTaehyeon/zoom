@@ -1,25 +1,25 @@
-import { log } from 'console';
-import express from 'express';
 import http from 'http';
-import WebSocket from 'ws';
-import { Server } from 'socket.io';
-//SocketIO
+import SocketIO from 'socket.io';
+import express from 'express';
 const app = express();
-
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');
 app.use('/public', express.static(__dirname + '/public'));
-app.get('/', (req, res) => res.render('home'));
-app.get('/*', (rep, res) => res.redirect('/'));
-
+app.get('/', (_, res) => res.render('home'));
+app.get('/*', (_, res) => res.redirect('/'));
 const httpServer = http.createServer(app);
-const wsServer = new Server(httpServer);
-wsServer.on('connection', (socket) => {
-  console.log(socket);
-});
+const wsServer = SocketIO(httpServer);
 
-const handleListen = () => console.log(`Listening on http://localhost:3004`);
-httpServer.listen(3004, handleListen);
+wsServer.on('connection', (socket) => {
+  socket.on('enter_room', (roomName, done) => {
+    console.log(roomName);
+    setTimeout(() => {
+      done('backEnd');
+    }, 1000);
+  });
+});
+const handleListen = () => console.log(`Listening on http://localhost:3006`);
+httpServer.listen(3006, handleListen);
 // 웹소켓 방식
 
 // const server = http.createServer(app);
