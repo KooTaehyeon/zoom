@@ -18,6 +18,7 @@ wsServer.on('connection', (socket) => {
     socket.join(roomName);
 
     done();
+    socket.to(roomName).emit('welcome');
   });
 });
 const handleListen = () => console.log(`Listening on http://localhost:3007`);

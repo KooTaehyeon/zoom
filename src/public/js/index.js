@@ -5,6 +5,12 @@ const room = document.getElementById('room');
 room.hidden = true;
 
 let roomName;
+const addMessage = (message) => {
+  const ul = room.querySelector('ul');
+  const li = document.createElement('li');
+  li.innerText = message;
+  ul.appendChild(li);
+};
 const showRoom = () => {
   welcome.hidden = true;
   room.hidden = false;
@@ -21,6 +27,10 @@ function handleRoomSubmit(e) {
 }
 
 form.addEventListener('submit', handleRoomSubmit);
+
+socket.on('welcome', () => {
+  addMessage('someone joined!');
+});
 // 웹소켓
 // const host = window.location.host;
 // const messageList = document.querySelector('ul');
