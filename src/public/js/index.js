@@ -16,21 +16,31 @@ const addMessage = (message) => {
 // 새 메세지 넣는 함수
 const handleMessageSubmit = (e) => {
   e.preventDefault();
-  const input = room.querySelector('input');
+  const input = room.querySelector('#msg input');
   const value = input.value;
   socket.emit('new_message', value, roomName, () => {
     addMessage('you:' + value);
   });
   value = '';
 };
+//닉네임
+const handleNickNameSubmit = (e) => {
+  e.preventDefault();
+  const input = room.querySelector('#name input');
+  const value = input.value;
+  socket.emit('nickname', value);
+};
+
 // 방 메세지 => 방 메세지가 보여지면 원래 방이름 만드는 곳이 사라짐
 const showRoom = () => {
   welcome.hidden = true;
   room.hidden = false;
   const h3 = room.querySelector('h3');
   h3.innerText = `Room ${roomName}`;
-  const form = room.querySelector('form');
-  form.addEventListener('submit', handleMessageSubmit);
+  const nameForm = room.querySelector('#name');
+  const msgForm = room.querySelector('#msg');
+  nameForm.addEventListener('submit', handleNickNameSubmit);
+  msgForm.addEventListener('submit', handleMessageSubmit);
 };
 // 방이 만들어지고 메세지를 적는곳
 function handleRoomSubmit(e) {
@@ -43,11 +53,11 @@ function handleRoomSubmit(e) {
 
 form.addEventListener('submit', handleRoomSubmit);
 
-socket.on('welcome', () => {
-  addMessage('someone joined!');
+socket.on('welcome', (user) => {
+  addMessage(`${user} joined!`);
 });
-socket.on('bye', () => {
-  addMessage('someone left!');
+socket.on('bye', (left) => {
+  addMessage(`${left} left!`);
 });
 socket.on('new_message', addMessage);
 
