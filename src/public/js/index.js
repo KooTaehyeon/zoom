@@ -21,7 +21,7 @@ const handleMessageSubmit = (e) => {
   socket.emit('new_message', value, roomName, () => {
     addMessage('you:' + value);
   });
-  value = '';
+  input.value = '';
 };
 //닉네임
 const handleNickNameSubmit = (e) => {
@@ -60,6 +60,18 @@ socket.on('bye', (left) => {
   addMessage(`${left} left!`);
 });
 socket.on('new_message', addMessage);
+socket.on('room_change', (rooms) => {
+  const roomsList = welcome.querySelector('ul');
+  roomsList.innerHTML = '';
+  if (rooms.length === 0) {
+    return;
+  }
+  rooms.forEach((room) => {
+    const li = document.createElement('li');
+    li.innerText = room;
+    roomsList.append(li);
+  });
+});
 
 // 웹소켓
 // const host = window.location.host;

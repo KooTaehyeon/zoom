@@ -1,6 +1,7 @@
 import http from 'http';
 import SocketIO from 'socket.io';
 import express from 'express';
+
 const app = express();
 app.set('view engine', 'pug');
 app.set('views', __dirname + '/views');
@@ -10,21 +11,42 @@ app.get('/*', (_, res) => res.redirect('/'));
 const httpServer = http.createServer(app);
 const wsServer = SocketIO(httpServer);
 
+function publicRooms() {
+  const {
+    sockets: {
+      adapter: { sids, rooms },
+    },
+  } = wsServer;
+  const publicRooms = [];
+  rooms.forEach((_, key) => {
+    if (sids.get(key) === undefined) {
+      publicRooms.push(key);
+    }
+  });
+  return publicRooms;
+}
+
 wsServer.on('connection', (socket) => {
   socket['nickname'] = 'Anon';
   socket.onAny((event) => {
+    console.log(wsServer.sockets.adapter);
     console.log(`Socket : ${event}`);
   });
   socket.on('enter_room', (roomName, done) => {
     socket.join(roomName);
-
     done();
     socket.to(roomName).emit('welcome', socket.nickname);
+    wsServer.sockets.emit('room_change', publicRooms());
   });
+
+  // 방이 떠날기 직전에 실행
   socket.on('disconnecting', () => {
     socket.rooms.forEach((room) =>
       socket.to(room).emit('bye', socket.nickname)
     );
+  });
+  socket.on('disconnect', () => {
+    wsServer.sockets.emit('room_change', publicRooms());
   });
   socket.on('new_message', (msg, room, done) => {
     socket.to(room).emit('new_message', `${socket.nickname}:${msg}`);
